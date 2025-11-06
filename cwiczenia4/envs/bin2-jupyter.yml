@@ -1,0 +1,14 @@
+name: bin2-jupyter
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.13.*
+  - numpy=2.3.*
+  - polars=1.35.*
+  - jupyter=1.1.*
+  - matplotlib=3.10.*
+  - seaborn=0.13.*
+  - bash_kernel=0.10.*
+  - pyhmmer=0.11.*
+
