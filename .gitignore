@@ -1,6 +1,7 @@
 # Other files to ignore
 *.pdf
 *.DS_Store
+*.hmm
 
 
 # Byte-compiled / optimized / DLL files
