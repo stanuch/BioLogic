@@ -4,23 +4,28 @@ This repository contains assignments and solutions for the "Bioinformatics 2" co
 
 -----
 
-## 📂 Repository Contents
+## Repository Contents
 
 This repository is organized by exercise number.
 * **Exercise 1: Jupyter Notebook Introduction**
-    * Foundational exercise introduces the Jupyter Notebook environment
-    * Covers the basics of the interface, how to create and execute code cells, and how to format text and notes using Markdown cells.
+   * Foundational exercise introduces the Jupyter Notebook environment
+   * Covers the basics of the interface, how to create and execute code cells, and how to format text and notes using Markdown cells.
 * **Exercise 2: Blast, Polars and Matplotlib**
-    * Focuses on performing sequence similarity searches using BLAST
-    * Data analyzed using the Polars DataFrame library.
-    * Matplotlib is used to create plots and visualize the findings from the alignment data.
+   * Focuses on performing sequence similarity searches using BLAST
+   * Data analyzed using the Polars DataFrame library.
+   * Matplotlib is used to create plots and visualize the findings from the alignment data.
 * **Exercise 3: Biological Databases**
-    * Focuses on accessing PDB, PubMed, Nucleotide, and PubChem.
-    * Includes data parsing, chemoinformatics (RDKit), TF-IDF, and PCA.
+   * Focuses on accessing PDB, PubMed, Nucleotide, and PubChem.
+   * Includes data parsing, chemoinformatics (RDKit), TF-IDF, and PCA.
+* **Exercise 4: HMMER, Pfam, and Domain Co-occurrence Analysis**
+   * Focuses on searching protein sequences against the Pfam database using PyHMMER.
+   * Involves identifying matches to the queried domain and filtering results based on coverage and iE-value.
+   * Extracts matching sequences to a FASTA file and performs a second search against the full Pfam database.
+   * Calculates and visualizes domain co-occurrence frequencies with Matplotlib, including cases where Peptidase_M23 appears alone.
 
 -----
 
-## 🔬 Biological Databases
+## Biological Databases
 
 This set of exercises focuses on programmatically accessing, parsing, and analyzing data from major biological databases using Python.
 
@@ -57,7 +62,7 @@ This set of exercises focuses on programmatically accessing, parsing, and analyz
 
 -----
 
-## 🛠️ Technologies Used
+## Technologies Used
 
   * **Core Language:** Python 3
   * **Environment:** Jupyter Notebook
