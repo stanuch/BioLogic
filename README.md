@@ -44,11 +44,7 @@ This repository is organized by exercise number.
 
 -----
 
-## Biological Databases
-
-This set of exercises focuses on programmatically accessing, parsing, and analyzing data from major biological databases using Python.
-
-**Key topics covered:**
+## Key Topics Covered
 
   * **Protein Data Bank (PDB):**
 
