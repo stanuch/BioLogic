@@ -22,6 +22,25 @@ This repository is organized by exercise number.
    * Involves identifying matches to the queried domain and filtering results based on coverage and iE-value.
    * Extracts matching sequences to a FASTA file and performs a second search against the full Pfam database.
    * Calculates and visualizes domain co-occurrence frequencies with Matplotlib, including cases where Peptidase_M23 appears alone.
+* **Exercise 5: Data Visualization & PCA**
+   * Focuses on dimensionality reduction and data clustering.
+   * Implementation of Principal Component Analysis (PCA) using `scikit-learn`.
+   * Visualization of high-dimensional biological data using `matplotlib`.
+* **Exercise 6: Genome Assembly Algorithms**
+   * Introduction to genome assembly concepts.
+   * Implementation and analysis of De Bruijn graphs.
+   * Understanding the process of generating contigs from sequencing reads.
+* **Exercise 7: Protein Structure Prediction (I-TASSER)**
+   * Protein structure prediction using the I-TASSER suite (Iterative Threading ASSEmbly Refinement).
+   * Modeling protein structures based on homology/threading.
+* **Exercise 8: RNA Bioinformatics**
+   * RNA secondary structure prediction algorithms. Analysis of energy landscapes and base-pairing probabilities.
+   * Implementation of the **Nussinov algorithm** (Python) for maximizing base pairs.
+   * Usage of **RNAfold** (ViennaRNA package) for minimum free energy (MFE) prediction. 
+* **Exercise 9: Protein Structure Validation**
+   * Comprehensive validation of experimental and predicted protein structures.
+   * Implementation of **RMSD** calculation using `NumPy` and Linear Algebra (SVD/Kabsch algorithm).
+   * Comparative analysis using **TM-score** and **GDT_TS** (PyMOL API).
 
 -----
 
