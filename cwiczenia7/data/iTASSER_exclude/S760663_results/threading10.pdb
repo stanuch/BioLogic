@@ -1,0 +1,38 @@
+Rank   :10 Template name:2jgdA1
+REMARK :Column 1 -  30 present Atom & Residue records of query sequence.
+REMARK :Column 31 - 54 present XYZ coordinates of query sequence obtained after threading alignment.
+REMARK :Column 55 - 59 present residue number in Template
+REMARK :Column 60 - 59 present residue name of Template
+ATOM   8001  CA  GLU    92       1.729 -13.239  43.169   68 GLU
+ATOM   8002  CA  LEU    93       4.312 -15.938  43.893   69 ALA
+ATOM   8003  CA  LEU    94       5.941 -15.553  40.485   70 LEU
+ATOM   8004  CA  ALA    95       6.277 -11.789  40.921   71 LYS
+ATOM   8005  CA  ARG    96       7.836 -12.254  44.335   72 GLN
+ATOM   8006  CA  ALA    97      10.183 -14.919  43.100   73 THR
+ATOM   8007  CA  MET    98      11.413 -13.504  39.852   74 TYR
+ATOM   8008  CA  GLN    99      10.601  -9.793  39.877   75 CYS
+ATOM   8009  CA  GLY   100      11.550  -8.541  43.304   76 GLY
+ATOM   8010  CA  ASP   101      15.149  -7.620  44.300   77 PRO
+ATOM   8011  CA  VAL   102      16.609 -10.737  42.666   78 ILE
+ATOM   8012  CA  ARG   103      16.675 -11.388  38.928   79 GLY
+ATOM   8013  CA  VAL   104      17.550 -15.000  38.159   80 ALA
+ATOM   8014  CA  GLN   107      18.432 -15.533  34.498   81 GLU
+ATOM   8015  CA  ILE   108      19.275 -19.113  34.299   82 TYR
+ATOM   8016  CA  ALA   109      17.071 -21.003  31.842   83 MET
+ATOM   8017  CA  GLU   110      19.663 -20.811  29.088   84 HIS
+ATOM   8018  CA  ASN   112      21.566 -23.430  31.113   85 ILE
+ATOM   8019  CA  PRO   113      21.049 -26.828  29.393   86 THR
+ATOM   8020  CA  GLU   114      21.476 -29.087  32.460   87 SER
+ATOM   8021  CA  PRO   115      17.974 -30.041  33.581   88 THR
+ATOM   8022  CA  ASP   116      19.049 -30.854  37.129   89 GLU
+ATOM   8023  CA  ALA   117      20.846 -27.536  37.608   90 GLU
+ATOM   8024  CA  ARG   118      17.810 -25.467  36.647   91 LYS
+ATOM   8025  CA  ARG   119      15.632 -27.709  38.815   92 ARG
+ATOM   8026  CA  TRP   120      18.215 -27.333  41.576   93 TRP
+ATOM   8027  CA  LEU   121      17.913 -23.553  41.281   94 ILE
+ATOM   8028  CA  ALA   122      14.120 -23.565  41.013   95 GLN
+ATOM   8029  CA  ALA   123      14.037 -25.648  44.194   96 GLN
+ATOM   8030  CA  ARG   124      16.111 -23.029  45.995   97 ARG
+ATOM   8031  CA  LEU   125      14.289 -19.871  44.939   98 ILE
+ATOM   8032  CA  GLU   126      10.772 -21.093  44.222   99 GLU
+TER
