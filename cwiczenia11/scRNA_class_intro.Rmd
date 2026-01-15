@@ -1,0 +1,623 @@
+---
+title: "scRNAseq intro class"
+author: "Krzysztof Szade"
+date: "2026-01-10"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = normalizePath(".")) # plik Rmd musi być w tym samym folderze, jak wasze pliki źródłowe
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+# Instalujemy niezbędne pakiety
+
+Jeżeli któs ma zainstalowane, to nie ma potrzeby ponownej instalacji. 
+Dlatego ta cześć jest wyłączona z głownego skryptu. 
+
+
+CRAN packages
+
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+install.packages(c(
+  "Seurat",
+  "dplyr",
+  "ggplot2",
+  "patchwork",
+  "cowplot",
+  "ggrepel",
+  "RColorBrewer",
+  "enrichR"
+))
+
+Bioconductor manager
+install.packages("BiocManager")
+
+
+
+Sprawdzamy czy wszystkie bilbioteki działają
+
+```{r }
+
+library("Seurat")
+library("ggplot2")
+library("Matrix")
+#library("enrichR")
+
+```
+
+
+## Wczytywanie danych 
+
+Każdy będzie pracował z własnym zestawem danych: 
+Proszę pobrać z Teams jeden wybrany "dataset".
+Dane pochodzą z https://www.weizmann.ac.il/sites/3CA/ Curated Cancer Cell Atlas KUDOS to Tirosh lab at the Weizmann Institute of Science! 
+Dla zainteresowanych orginalny artykuł: 
+Nature. 2023 Jun;618(7965):598-606. doi: 10.1038/s41586-023-06130-4. Epub 2023 May 31.
+Hallmarks of transcriptional intratumour heterogeneity across a thousand tumours
+https://www.nature.com/articles/s41586-023-06130-4 powinniście mieć dostęp z sieci UJ. 
+
+To dane źródłowe - ale już po "zmapowaniu" i zliczeniu UMI (ale jak się okaże później, nie zawsze całkiem surowe)
+
+Wczytujemy:
+
+plik Exp_data_UMIcounts.mtx - zliczenia UMI - format spare matrix - czesto wykorzystywany gdy mamy w macierzy duzo zer 
+plik Cell.csv - metadata dla poszczególnej komórki (tutaj ograniczamy się tylko do dwóch pierwszych kolumn)
+plik Genes.csv - geny ujęte w analizie 
+
+
+```{r}
+
+counts <- readMM("Exp_data_UMIcounts.mtx")
+head(counts)
+
+cells <- read.csv("Cells.csv")
+head(cells)
+
+genes <- read.delim("Genes.txt", header = FALSE)
+head(genes)
+```
+
+## Tworzymy obiekt Seurat 
+
+Wiersze - to nazwy genów
+Kolumny - to "barcody" komórek
+
+```{r}
+rownames(counts) <- genes[,1]
+colnames(counts) <- cells[,1]
+seurat_obj <- CreateSeuratObject(counts = counts, min.cells = 3)
+```
+
+Sprawdzamy wymiary naszego obiektu i czy wszystko się zgadza. 
+
+```{r}
+dim(counts)            # genes x cells
+head(rownames(counts))
+head(colnames(counts))
+
+```
+
+Sprawdź w RStudio jak wygląda obiekt klasy Seurat, zwróć uwagę na Identity, Assays, Metadata...
+
+Seurat ma w danym momencie wybraną jedną zmienną grupującą  "Identity" 
+W tym przypadku tzw. "orgin.ident" będzie reprezentował próbki poszczególnych pacjentów, automatycznie czytane z nazw barcodów. 
+
+Sprawdźmy sobie: 
+
+```{r}
+levels(Idents(seurat_obj))
+```
+
+Czasami chcemy mieć jednak na wykresach dane nie osobno dla każdego pacjenta, ale zbiorczo, dlatego taki mały trik: robimy jedną zmieną all_cells gdzie wszytskie komórki będą miały tą samą wartość. Za chwilę się przyda.
+
+
+```{r}
+seurat_obj$all_cells <- "all"
+```
+
+
+## Uzupełniamy metadane 
+
+Dla każdej komórki mamy dostępne metadane w pliku Cells.csv, który mamy już mamy w dataframe cells: 
+Barcody identyfikujące każdą komórkę są w pierwszej kolumnie, a mają być w nazwach wierszy "rownames". 
+Musimy to zmienić, aby dodać nasze metadane. 
+
+```{r}
+rownames(cells) <- cells[,1]   # kolumna 1 ma barkody, przypisujemy do nazw wierszy 
+cells <- cells[,-1]             # teraz możemy już usnąć pierwsza kolumnę 
+head(cells)                   # spr czy wszystko się zgadza 
+
+seurat_obj <- AddMetaData(seurat_obj, metadata = cells) # dodajemy metadata
+
+head(seurat_obj@meta.data) # no i spr. 
+```
+
+# Dane poszczególnych pacjentów
+Oprócz tego dla każdego pacjenta mamy dodatkowe informację w pliku Sample.csv, wczytajmy te dane i dodajamy jako metadane dla każdej komórki pochodzącej odpowiednio dla każego pacjenta. 
+Tutaj musimy uważać na format danych, żeby dla każdej komórki mieć informacje z Sample.csv 
+
+```{r}
+samples <- read.csv("Samples.csv", row.names = 1)
+head(samples)
+
+# cell-level sample vector
+cell_samples <- seurat_obj$sample # tutaj mamy już ID pacjentów, zapisujemy je, to wektor spr jego dlugość 
+
+#sample-level info
+samples_to_add <- samples[cell_samples, , drop = FALSE] # tutaj ważny trik przy indeksowaniu: drop = FALSE, spr. wymiary.  
+
+#add to Seurat
+seurat_obj <- AddMetaData(seurat_obj, metadata = samples_to_add)
+
+
+head(seurat_obj@meta.data)
+```
+
+
+## QC danych 
+
+Obiekt Seurat ma wyjściowo dwie podstawowe statystyki:
+liczba genów o niezerowej exp. "nFeature_RNA" oraz liczba UMI na komórkę "nCount_RNA".
+
+Zobaczmy co tu się dzieje...
+
+
+```{r}
+VlnPlot(seurat_obj, "nFeature_RNA")
+VlnPlot(seurat_obj, "nCount_RNA")
+VlnPlot(seurat_obj, "nCount_RNA") + scale_y_log10()
+```
+
+Opcjonalnie: do "features" w funkcji VlnPlot można wrzucić więcej wykresów, oraz zrobić jeden wykres bez rozdziału na pacjentów z wykorzystaniem naszej zmiennej all_cells :) 
+
+```{r}
+VlnPlot(seurat_obj, features = c("nFeature_RNA","nCount_RNA"))
+VlnPlot(seurat_obj, features = c("nFeature_RNA","nCount_RNA"), group.by = "all_cells")
+```
+
+Przyjrzyjmy się w szczególności danym nFeature_RNA - czy widzimy tu coś niepokojącego ? 
+
+
+# Dodajemy informacje o odczytach mitochondrialnych i rybsomalnych.
+
+Geny mitochondrialne/rybosomalne maja w nazwie MT- RPS/RPL
+
+```{r}
+# Percent mitochondrial
+seurat_obj[["percent.mt"]] <- PercentageFeatureSet(
+  seurat_obj,
+  pattern = "^MT-"
+)
+
+# Percent ribosomal
+seurat_obj[["percent.ribo"]] <- PercentageFeatureSet(
+  seurat_obj,
+  pattern = "^RPS|^RPL"
+)
+
+VlnPlot(
+  seurat_obj,
+  features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.ribo"),
+  ncol = 4,
+  pt.size = 0
+)
+
+```
+
+Niektóre zestawy danych mogą nie zawierać danych dla genów mitochondrialnych, wtedy przyjrzymy się dokładnie genom rybosomalnym. 
+Jeżeli wasz zestaw danych ma dany rybosomalne spr. je również jak poniżej. 
+
+
+```{r}
+FeatureScatter(
+  seurat_obj,
+  feature1 = "percent.ribo",
+  feature2 = "nFeature_RNA"
+)  
+
+```
+
+
+```{r}
+FeatureScatter(
+  seurat_obj,
+  feature1 = "percent.ribo",
+  feature2 = "nCount_RNA"
+) + 
+    scale_y_log10()
+```
+
+Zobaczmy jak rozkładają się te dane, jaki rozkład może być niepokojący?
+Sprawdźmy czy rozkład nie zalezy np od tego czy komórka jest nowotworowa, albo od typu komórek? Jak to wyjaśnić i jakie to ma znaczenie przy ocenie jakości danych i filtrowaniu ? 
+Jako aktywną zmienną możemy wybrać jedeną z naszych meta danych, sprawdź rożne metadane, które mogą tu mieć znaczenie 
+
+```{r}
+Idents(seurat_obj) <- "cell_type"
+```
+
+Z reguły musimy odfiltrować komórki słabej jakości. 
+
+Używamy funkcji subset. 
+
+```{r}
+seurat_obj <- subset(seurat_obj, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
+```
+
+
+
+## Zadanie nr 1 
+
+Przeprowadź analizę QC i wskaż potencjalne problemy danego zestawu danych.  
+- przygotuj wykresy, które wykorzystałeś przy ocenie jakości danych i krótko omów ich znaczenie
+- heterogenność danych, z czego wynika, wykorzystaj dostępne metadane, żeby ją ocenić.  
+- uzasadnij przyjęte wartości przy odrzucaniu komórek słabej jakości, jeżeli je zastosowałeś, uzasadnij także, w przypadku braku konieczności odrzucania danych
+
+
+## Normalizacja danych 
+
+Zobaczmy na wstępie jak wyglądają nasze nieznormalizowane dane dla wybranego genu. 
+
+```{r error=TRUE}
+VlnPlot(seurat_obj, features = "RAN")
+```
+
+
+Widzimy ilość zliczeń UMI dla wybranego genu. 
+
+Ale ilość tych zliczeń mocno zależy od "głębokości" sekwencjonowania poszczególnej komórki: ilość odczytów dla każdej każdej komórki jest inny (inna "głebokość" sekwencjonowania). 
+
+Zobaczmy to jeszcze raz... 
+
+```{r}
+hist(
+  seurat_obj$nCount_RNA,
+  breaks = 50,
+  main = "Sequencing depth per cell (raw)",
+  xlab = "Total UMIs per cell"
+)
+
+```
+
+
+Do normalizacji danych w Seuracie służy funkcja 
+
+```{r}
+?NormalizeData
+```
+
+W jaki sposób normalizuję się rożną głebokość sekwencjonowania?
+Co oznacza scale.factor? 
+W jaki sposób normalizuje się rozkład danych? 
+Co oznacza i dlaczego stosujemy funkcję log1p(x):
+
+Normalizujemy. Uwaga dane znormalizowane są w nowej warstwie "layer", innej niż wyjściowe zliczenia, które są w warstwie "counts"
+
+```{r}
+seurat_obj <- NormalizeData(seurat_obj)
+
+norm_mat <- GetAssayData(seurat_obj, assay = "RNA", layer = "data")
+norm_sum <- colSums(norm_mat)
+
+raw_mat <- GetAssayData(seurat_obj, assay = "RNA", layer = "counts")
+raw_sum <- colSums(raw_mat)
+
+
+hist(raw_sum,
+     breaks = 50,
+     main = "Before normalization",
+     xlab = "Total UMIs per cell")
+
+hist(norm_sum,
+     breaks = 50,
+     main = "After normalization",
+     xlab = "Sum of log-normalized expression")
+```
+
+
+## Szukamy genów o największej wariancji
+
+W Seuracie mamy wbudowaną funkcję FindVariableFeatures, spr. 
+
+```{r}
+?FindVariableFeatures
+```
+
+
+Dlaczego szukamy genów o największej wariancji? 
+OK, a dlaczego nie możemy poprostu wziąć tych o największej wariancji? 
+Zobaczmy: 
+
+```{r}
+mat <- GetAssayData(seurat_obj, layer = "data")
+
+gene_mean <- Matrix::rowMeans(mat)
+gene_var  <- apply(mat, 1, var)
+
+df <- data.frame(
+  mean = gene_mean,
+  variance = gene_var
+)
+
+plot(
+  log10(df$mean + 1e-8),
+  log10(df$variance + 1e-8),
+  pch = 16, cex = 0.3,
+  xlab = "log10(mean expression)",
+  ylab = "log10(variance)",
+  main = "Mean–variance relationship (raw)"
+)
+
+#local polynomial regression - metoda dopasowania trendu, wykorzystując "lokalne" dane na wykresie (span użyty do określenia tej lokalności); używamy wartości logarytmowanych, wieć dodajemy niski tzw. pseudocount 1e-8
+lo <- loess(
+  log10(variance + 1e-8) ~ log10(mean + 1e-8),
+  data = df,
+  span = 0.3
+)
+
+ord <- order(df$mean)
+
+lines(
+  log10(df$mean[ord] + 1e-8),
+  predict(lo)[ord],
+  col = "red", lwd = 2
+)
+
+```
+
+Czy widać geny o większej niż spodziewana wariancji ? 
+
+Poniżej kod, który zwizualizuje nam spodziewaną wariancję. Które geny śa najciekawsze pod względem naszej analizy? 
+
+Co to jest znormalizowana wariancja ("standardized variance")
+
+```{r}
+expected_logvar <- predict(lo)
+residuals <- log10(df$variance + 1e-8) - expected_logvar
+
+plot(
+  log10(df$mean + 1e-8),
+  residuals,
+  pch = 16, cex = 0.3,
+  xlab = "log10(mean expression)",
+  ylab = "Standardized variance (residual)",
+  main = "Variance after mean correction"
+)
+
+abline(h = 0, col = "red", lwd = 2)
+
+```
+
+Jak już mniej więcej wiemy co robi ta funkcja aplikujemy do naszych danych i pokazujemy jej efekt
+
+```{r}
+seurat_obj <- FindVariableFeatures(seurat_obj)
+VariableFeaturePlot(seurat_obj)
+```
+
+## Skalowanie danych 
+
+Czym jest i jaką funkcję pełni "z-score normalization"? 
+
+W Seurat do skalowania danych mamy funkcję ScaleData 
+
+```{r}
+?ScaleData
+```
+
+Zobaczmy co nam daje z-normalizacja.
+
+```{r}
+seurat_obj <- ScaleData(seurat_obj)
+```
+
+
+```{r}
+# before
+hist(apply(GetAssayData(seurat_obj, layer = "data"), 1, var),
+     breaks = 50, main="Variance before scaling", xlab="Variance")
+
+# after
+hist(apply(GetAssayData(seurat_obj, layer = "scale.data"), 1, var),
+     breaks = 50, main="Variance after scaling", xlab="Variance")
+abline(v=1, col="red", lwd=2)
+
+```
+
+Wiekszość genów ma średnią wariancje ~ 1. 
+
+
+## Reduckja wymiarowości 
+ 
+W celu wizualizacji danych musimy pozbyć się szumu i znaleźć zmienne(geny), które najlepiej obrazują nam heterogenność wśród badanego zbioru komórek, a pozbędziemy się genów "nudnych", które nie różnią się istotonie pomiędzy komórkami. 
+W tym celu wykorzystujemy PCA i sprawdźmy czy działa jak się spodziwamy - tip: polecam ustawić Identidy na jedna z metadata, które spodziewamy się będą nam rozróżniać komórki np. typ komórek czy pacjentów 
+
+```{r}
+seurat_obj <- RunPCA(seurat_obj)
+
+# sprawdźmy cc
+Idents(seurat_obj) <- "cell_type"
+DimPlot(seurat_obj, reduction = "pca")
+Idents(seurat_obj) <- "sample"
+DimPlot(seurat_obj, reduction = "pca")
+```
+
+# Ile PCAs potrzebujemy ? 
+
+Zobaczmy ile każda z kolejnych kompotent PCA wyjaśnia nam zmienności:
+
+```{r}
+ElbowPlot(seurat_obj, ndims = 40)
+```
+
+Uwzględnienie kolejnych komponent PCA, które nic nie wyjaśnianiają będzie tylko źródłem większego "szumu" 
+
+## Klastrowanie 
+
+Klastrowanie danych z scRNAseq wymaga bardziej bardziej zaaawnsowanych metod niż standartowe Euclidean norm czy  Cosine measure 
+Seurat ma wbudowane funkcje oparte na klastrowaniu opartym na grafach i tzw. porównywaniu sąsiedztwa (modyfikuje wagi w grafach) (Funkcja FindNeighbours), przed właściwym klastrowaniem Louvaina (FindClusters). 
+
+Na poczatku wybieramy tylko tyle PCA ile zdecydowaliśmy, że wnoszą informację dims = ... 
+Resolution określa jak dzielimy grafy na pojedyncze grupy/klastry, niska rozdzielczość, "niski zoom", widzimy tylko głowne grupy komórek i tak je dzielimy, wysoka rozdzielczość, "mocny zoom" widzimy dokładne szczegóły grafów, możemy podzielić na więcej grup. 
+
+
+```{r}
+seurat_obj <- FindNeighbors(seurat_obj, dims = 1:22)
+seurat_obj <- FindClusters(seurat_obj, resolution = 0.8)
+```
+
+## Wizualizacja danych 
+
+Do wizualizacji wielowymiarowych nieliniowych danych w 2D Seurat wykorzustuje UMAP, wybierz określoną wcześniej liczbę komponent PCA  
+
+```{r}
+seurat_obj <- RunUMAP(seurat_obj, dims = 1:22) 
+DimPlot(seurat_obj, reduction = "umap", label = TRUE)
+```
+
+
+## Zadanie 2
+# A) Zwizaulizuj jakie efekt ma ilość wybranych komponent PCA na póżniejszą analizę, wybierz znacznie mniej i więcej niż optymalnie i pokaż efekt, w którym przypadku więcej ryzykujemy utraty potencjalnych informacji? 
+
+# B) Przeprować i porównaj klastrowanie z różną rozdzielczością (3/4 wartości w przedziale 0.3 - 1.8). Zwróć uwagę jak dobrze rozdzielają się poszczególny klastry, czy indywidulne klastry zajmują różną pozycję na wykresie UMAP, która rozdzielczość według ciebie ma największy sens  
+
+
+## Analiza i anotacja poszczególnych klastrów 
+
+W naszym przyadku mamy uproszczone zadanie - dysponujemy informacjami, które pochodzą z wcześniej przeprowadzonych analiz - mamy je  zapisane w naszych metadata. Zobaczmy jak to wygląda, dla poszczególnych pacjentów, czy wcześniej przypisanych typów komórek, w zależnoścu czy komórka jest nowotworowa czy nie.
+
+```{r}
+DimPlot(seurat_obj, group.by = "cell_type")
+DimPlot(seurat_obj, group.by = "sample", label = TRUE)
+```
+
+## Zadanie 3 
+Zinterpretuj te wyniki - co ma największt wpływ na klastrowanie, pacjent, czy fakt czy komórka jest nowotworowa czy nie, czy może przypisywany typ komórki? 
+
+
+# Znajdowanie markerów poszczególnych klastrów
+Seurat ma funkcje znajdowania markerów poszczególnych klastrów FindAllMarkers(seurat_obj) - ale to może trwać długo, zainstalowanie pakietu presto może skrócić ten czas. 
+Alternatywnie, na potrzeby naszych ćwiczeń, możemy znaleźć markery wybranego jednego czy dwóch klastrów. 
+
+```{r}
+# install.packages('devtools') ewentualnie mozna zainstalowac 
+# devtools::install_github('immunogenomics/presto')
+
+ 
+# markers <- FindAllMarkers(seurat_obj) to moze trwać za długo 
+
+cluster0.markers <- FindMarkers(seurat_obj, ident.1 = 0, logfc.threshold = 0.25, test.use = "roc", only.pos = TRUE) # tutaj wskazuje się który klaster nas intersuje, jaką metodę używamy do szukania klastrów
+
+```
+
+Sprawdźmy jak specyficzne są wskazane markery dla danego klastra
+
+Sprawdźmy pierwsze 4 najbardziej wzbogacone markery wybranego klastra. 
+
+```{r}
+VlnPlot(seurat_obj, features = rownames(cluster0.markers)[1:4])
+```
+
+```{r}
+FeaturePlot(seurat_obj, features = rownames(cluster0.markers)[1:4])
+```
+
+
+## Anotacja klastrów 
+
+Istnieją tysiące różnych populacji, subpopulacji i ich subpoplacji... Istnieje szereg bazy, które zawierają tzw. ontologię genów - grupują/przypisują geny specyficzne dla danej populacji czy procesu biologicznego, lokalizacji komórkowej itp. Grupy genów nazwyane są często jako GO Terms. 
+
+Możemy sprawdzić czy nasze znalezione markery dla danego klastra są statystycznie częściej znajdowane w poszczególnych grupach genów, GO Term, niż przypadkowo (np. test hypergeometryczny), tzw. analiza wzbogacenia, lub nadreprezentacji.  
+
+Spróbujmy wykorzsytać do tego bibliotekę enrichR https://maayanlab.cloud/Enrichr/
+Zobaczmy ile baz danych mamy tutaj dostępnych... listEnrichDbs()
+
+```{r}
+
+library(enrichR)
+
+dbs <- listEnrichrDbs()
+head(dbs)
+
+```
+
+Wybierzmy na początek bazę "Human_Gene_Atlas" która zawiera grupy genów dla poszczególnych populacji. 
+Wybierzmy na początek 50 pierwszych markerów (najbardziej istotnych) dla naszego klastra, i zobaczmy jakie statystyki otrzymujemy. 
+
+```{r}
+markers <- rownames(cluster0.markers)[1:50]
+
+enrich.res <- enrichr(markers, "Human_Gene_Atlas") 
+head(enrich.res)
+```
+
+Spróbujmy to zwizualizować, zwróć uwagę na skalę. 
+
+```{r}
+barplot(
+  -log10(enrich.res[[1]]$Adjusted.P.value[1:10]),
+  names.arg = enrich.res[[1]]$Term[1:10],
+  las = 2,
+  main = "Co to za komórki :)"
+)
+```
+
+
+
+## Zadanie 4 
+
+#A Zwizualizuj ekspresję wybranych markerów dla kolejnego klastra/ów i zinterpretuj wyniki - czy wskazane markery danego klastra są unikatowe i wystarczające do jednoznacznej jego definicji, czy badany klaster/populacja słabo odróżnia się od pozostałych? 
+
+#B Spróbuj zindetyfikować komórki w oparciu o kilka różnych baz danych, np. , "PanglaoDB_Augmented_2021" "ARCHS4_Tissues" "CellMarker_2024" Spr. czy klaster który analizujesz jest anotowany jako nowotowrowy czy nie - możesz spróbować zindetyfikować typ nowotworu korzystając z baz takich jak: Cancer_Cell_Line_Encyclopedia MSigDB_Hallmark_2020. Przedstaw wyniki na wykresie i krótko zinterpretuj
+
+
+
+## Dla chętnych :) 
+
+Poniżej jak zrobic analizę cyklu komórkowego dla poszzcególnej komórki w oparciu o ekspresję genów. 
+
+Warto też zobaczyć publikajcę z której wyniki analizujecie i porównać waszą analizę z tą opublikowaną w artykule.  
+
+
+
+```{r error = TRUE}
+cc.genes <- Seurat::cc.genes
+s.genes  <- cc.genes$s.genes
+g2m.genes <- cc.genes$g2m.genes
+
+DefaultAssay(seurat_obj)
+
+seurat_obj <- CellCycleScoring(seurat_obj,
+  object = seurat_obj,
+  g2m.features = cc.genes$g2m.genes,
+  s.features = cc.genes$s.genes)
+head(seurat_obj@meta.data)
+
+```
+
+?CellCycleScoring
+
+```{r error = TRUE}
+s.genes.use  <- intersect(s.genes, rownames(seurat_obj))
+g2m.genes.use <- intersect(g2m.genes, rownames(seurat_obj))
+
+seurat_obj <- CellCycleScoring(
+  seurat_obj,
+  s.features = s.genes.use,
+  g2m.features = g2m.genes.use,
+  assay = "RNA",
+  slot = "data",
+  set.ident = FALSE
+)
+```
+
+
+
