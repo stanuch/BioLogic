@@ -345,21 +345,27 @@ Strona internetowa:
 
 | Model | TM-score | RMSD [Å] | Liczba dopasowanych reszt |
 |------|----------|----------|----------------------------|
-| AF2 | | | | 
-| I-TASSER (exclude) | | | | 
-| I-TASSER (100% ident) | | | | 
+| AF2 | 0.9166 | 2.086 | 214 | 
+| I-TASSER (exclude) | 0.3340 | 15.734 | 214 | 
+| I-TASSER (100% ident) | 0.9937 | 0.455 | 214 | 
 
 
 #### Pytania do analizy
 
 1. Który model wykazuje najwyższą wartość TM-score?
+    - I-TASSER (100% ident)
 2. Czy kolejność modeli według TM-score jest zgodna z kolejnością według RMSD?
+    - Tak
 3. Które modele przekraczają próg TM-score = 0.5 i co to oznacza?
+    - Dwa modele: AF2 i I-TASSER (100% ident). Oznacza to, że te modele mają poprawnie odwzorowany globalny zwój.
 4. Jak obecność lub brak homologów wpływa na jakość predykcji struktury?
+    - Brak homologów znacząco obniżył jakość predykcji.
 
 ---
 
 ## Zadanie 3. 
+
+TEGO ZADANIA NIE UDAŁO MI SIĘ ZROBIĆ :/
 
 ### Obliczanie wskaźnika GDT na podstawie superpozycji struktur białkowych
 
@@ -479,9 +485,9 @@ Strona internetowa:
 
 | Struktura | % reszt z 3D-1D score ≥ 0.1 |
 |----------|-----------------------------|
-| 7qvb_A.pdb (referencja) | |
-| af2_pred.pdb (AlphaFold2) | |
-| I-TASSER_exclude.pdb (I-TASSER) | |
+| 7qvb_A.pdb (referencja) | 77.10% |
+| af2_pred.pdb (AlphaFold2) | 71.91% |
+| I-TASSER_exclude.pdb (I-TASSER) | 52.34% |
 
 
 #### Analiza danych z Verify3D (AlphaFold2)
@@ -505,6 +511,7 @@ Na podstawie pliku zapisanego przy użyciu opcji **“Save to data file”**:
 - Uzupełniona tabela wyników,
 - Wygenerowane wykresy dla modelu AlphaFold2,
 - Krótki komentarz (3–5 zdań) interpretujący uzyskane wyniki.
+    - Większość reszt w modelu AlphaFold znajduje się w klasie dobrej lub akceptowalnej, co świadczy o poprawnym dopasowaniu sekwencji do modelu strukturalnego. Obszary o ujemnych wynikach występują głównie na końcach łańcucha, ponieważ te fragmenty są trudniejsze do predykcji. Ogólnie wysoki udział reszt o pozytywnym wyniku potwierdza, że model jest wiarygodny.
 
 ---
 
@@ -535,22 +542,27 @@ Tabela do uzupełnienia:
 
 | Parametr | Zn2+ (oryginał) | Mg2+ (MODEL) |
 |----------|------------------|--------------|
-| Occupancy| | | 
-| Bfactor | | | 
-| Atomic contacts | | | 
-| Valence | | | 
-| nVECSUM | | | 
-| Geometry | | | 
-| gRMSD| | | 
-| Vacancy | | | 
-| Bidentate | | |
+| Occupancy| 0.5 | 0.5| 
+| Bfactor | 44.3 (51.7) | 24.2 (60.5) | 
+| Atomic contacts | 4 | 4 | 
+| Valence | 1.4 | 1.5 | 
+| nVECSUM | 0.17 | 0.2 | 
+| Geometry | Tetrahedral | Tetrahedral | 
+| gRMSD| 22.2 | 22.2 | 
+| Vacancy | 0 | 0 | 
+| Bidentate | 0.0 | 0.0 |
 
 Pytania:
 1. Czy CheckMyMetal zgłasza ostrzeżenia dla wersji z Mg2+? Jakie?
+    - Tak, CMM niektóre elementy w raporcie zaznacza na czerwono, co może dać sygnał, że coś jest nie tak (np. za niski B-factor w porównaniu do otoczenia)
 2. Które parametry geometrii uległy pogorszeniu?
+    - Głównie B-factor oraz Valence, co oznacza złe dopasowanie wiązań
 3. Czy geometria koordynacyjna jest zgodna z preferencjami Mg2+?
+    - Nie. Wykryta geometria tetraedryczna, a magnez preferuje geometrię oktaedryczną
 4. Jak mapa gęstości elektronowej wspiera lub podważa obecność Mg2+?
+    - Tego niestety nie wiem
 5. Na podstawie danych – który jon jest bardziej prawdopodobny?
+    - Zn2+
 
 *Załącz wyeksportowane grafiki*
 
