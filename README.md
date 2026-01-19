@@ -2,8 +2,6 @@
   <img src="img/uj_logo.png" width="400" alt="Jagiellonian University Logo">
 </p>
 
-# <p align="center">Bioinformatics</p>
-
 This repository contains implementations of algorithms, data pipelines, and analysis tools developed during the **Bioinformatics 2** curriculum at the Faculty of Biochemistry, Biophysics and Biotechnology, Jagiellonian University. The focus is on the mathematical implementation of biological algorithms and efficient data processing
 
 ---
