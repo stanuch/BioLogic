@@ -225,3 +225,5 @@ __marimo__/
 # R Project
 .Rproj.user/
 *.mtx
+.RData
+.Rhistory
