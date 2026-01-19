@@ -1,88 +1,46 @@
-# Bioinformatics 2 - Jagiellonian University
+<p align="center">
+  <img src="img/uj_logo.png" width="400" alt="Jagiellonian University Logo">
+</p>
 
-This repository contains assignments and solutions for the "Bioinformatics 2" course (Academic Year 2025/2026) at Jagiellonian University.
+# <p align="center">Bioinformatics</p>
 
------
+This repository contains implementations of algorithms, data pipelines, and analysis tools developed during the **Bioinformatics 2** curriculum at the Faculty of Biochemistry, Biophysics and Biotechnology, Jagiellonian University. The focus is on the mathematical implementation of biological algorithms and efficient data processing
 
-## Repository Contents
+---
 
-This repository is organized by exercise number.
-* **Exercise 1: Jupyter Notebook Introduction**
-   * Foundational exercise introduces the Jupyter Notebook environment
-   * Covers the basics of the interface, how to create and execute code cells, and how to format text and notes using Markdown cells.
-* **Exercise 2: Blast, Polars and Matplotlib**
-   * Focuses on performing sequence similarity searches using BLAST
-   * Data analyzed using the Polars DataFrame library.
-   * Matplotlib is used to create plots and visualize the findings from the alignment data.
-* **Exercise 3: Biological Databases**
-   * Focuses on accessing PDB, PubMed, Nucleotide, and PubChem.
-   * Includes data parsing, chemoinformatics (RDKit), TF-IDF, and PCA.
-* **Exercise 4: HMMER, Pfam, and Domain Co-occurrence Analysis**
-   * Focuses on searching protein sequences against the Pfam database using PyHMMER.
-   * Involves identifying matches to the queried domain and filtering results based on coverage and iE-value.
-   * Extracts matching sequences to a FASTA file and performs a second search against the full Pfam database.
-   * Calculates and visualizes domain co-occurrence frequencies with Matplotlib, including cases where Peptidase_M23 appears alone.
-* **Exercise 5: Data Visualization & PCA**
-   * Focuses on dimensionality reduction and data clustering.
-   * Implementation of Principal Component Analysis (PCA) using `scikit-learn`.
-   * Visualization of high-dimensional biological data using `matplotlib`.
-* **Exercise 6: Genome Assembly Algorithms**
-   * Introduction to genome assembly concepts.
-   * Implementation and analysis of De Bruijn graphs.
-   * Understanding the process of generating contigs from sequencing reads.
-* **Exercise 7: Protein Structure Prediction (I-TASSER)**
-   * Protein structure prediction using the I-TASSER suite (Iterative Threading ASSEmbly Refinement).
-   * Modeling protein structures based on homology/threading.
-* **Exercise 8: RNA Bioinformatics**
-   * RNA secondary structure prediction algorithms. Analysis of energy landscapes and base-pairing probabilities.
-   * Implementation of the **Nussinov algorithm** (Python) for maximizing base pairs.
-   * Usage of **RNAfold** (ViennaRNA package) for minimum free energy (MFE) prediction. 
-* **Exercise 9: Protein Structure Validation**
-   * Comprehensive validation of experimental and predicted protein structures.
-   * Implementation of **RMSD** calculation using `NumPy` and Linear Algebra (SVD/Kabsch algorithm).
-   * Comparative analysis using **TM-score** and **GDT_TS** (PyMOL API).
+### Academic Objectives and Methodology
 
------
+A major component of the coursework involved the prediction and mathematical validation of macromolecular structures. This includes an implementation of the Nussinov algorithm, which utilizes dynamic programming for RNA secondary structure prediction based on base-pair maximization.
 
-## Key Topics Covered
+To validate structural models, the Kabsch algorithm was implemented using Singular Value Decomposition (SVD) to calculate the Root-Mean-Square Deviation (RMSD) between atomic coordinates. Additionally, the projects utilize the PyMOL API to calculate validation metrics such as TM-scores and GDT_TS. Protein threading was performed using the I-TASSER suite.
 
-  * **Protein Data Bank (PDB):**
+### Data Engineering and Chemoinformatics
 
-      * Downloading `.pdb` files (e.g., `1UBQ`) via `urllib`.
-      * Parsing atom coordinates to calculate geometric distances between atoms.
+This repository contains automated pipelines designed to acquire and process data from public repositories, including NCBI E-utils, the Protein Data Bank (PDB), and PubChem. To handle large datasets efficiently, the Polars library was used for data manipulation, prioritizing memory management over traditional processing frameworks.
 
-  * **PubMed (NCBI E-utils):**
+The work also includes Natural Language Processing techniques, specifically TF-IDF vectorization, applied to scientific literature for MeSH term analysis. In the field of chemoinformatics, RDKit was utilized to compute physicochemical properties and to generate visualizations of molecular structures.
 
-      * Using `esearch` to find publication IDs (PMIDs) by author.
-      * Using `efetch` to retrieve publication details.
-      * Parsing XML responses with `lxml` to extract titles, abstracts, and MeSH terms.
-      * Aggregating data (e.g., counting word occurrences in abstracts).
+### Genomics and Sequence Analysis
 
-  * **Nucleotide (NCBI E-utils):**
+The projects in this section explore the logic behind de novo genome assembly. Specifically, the code implements De Bruijn graphs to demonstrate how short sequencing reads are processed into continuous contigs.
 
-      * Retrieving sequence records (`GBSeq_definition`, `GBSeq_sequence`).
-      * Writing a function to automatically save downloaded records in the FASTA format.
+Furthermore, protein domain analysis was conducted using PyHMMER to query the Pfam database. This work involved the application of Hidden Markov Models (HMMs) to identify domain architectures. The analysis includes the implementation of statistical filtering, such as iE-values and sequence coverage thresholds, to ensure biological relevance.
 
-  * **PubChem & Chemoinformatics:**
+### Structural Bioinformatics and Mathematical Validation
 
-      * Querying the PubChem API to retrieve drug properties and SMILES strings from drug names.
-      * Using `RDKit` to calculate key physicochemical properties (MolWt, LogP, TPSA, H-Donors/Acceptors).
-      * Visualizing 2D molecule structures from SMILES strings.
+The most technically demanding aspect of the course involved the prediction and validation of macromolecular structures. This included protein threading using the **I-TASSER** suite and the implementation of the **Nussinov algorithm** for RNA secondary structure prediction based on base-pair maximization.
 
-  * **Data Analysis:**
+To ensure the accuracy of structural models, I implemented the **Kabsch algorithm** using **Singular Value Decomposition (SVD)** to calculate the Root-Mean-Square Deviation (RMSD) between atomic coordinates. This mathematical approach to structural validation was complemented by the use of the PyMOL API to calculate TM-scores and GDT_TS, providing a robust framework for assessing the quality of predicted models against experimental data.
 
-      * Applying **TF-IDF** (Term Frequency-Inverse Document Frequency) to vectorize text data (MeSH terms).
-      * Using **PCA** (Principal Component Analysis) with `scikit-learn` for dimensionality reduction.
-      * Visualizing data clusters (e.g., drug groups vs. other compounds) with `matplotlib`.
+---
 
------
+### Technical Stack
 
-## Technologies Used
+* **Data Analysis:** Polars, NumPy, SciPy, and Scikit-learn (PCA, StandardScaler)
+* **Bioinformatics & Chemistry:** Biopython, PyHMMER, RDKit, AlphaFold and ViennaRNA
+* **Structural Tools:** PyMOL API and I-TASSER integration
+* **Environment:** Jupyter Notebooks
+* **Visualization:** Matplotlib and Seaborn
 
-  * **Core Language:** Python 3
-  * **Environment:** Jupyter Notebook
-  * **Data Fetching:** `urllib`, `requests`
-  * **Parsing:** `lxml` (for XML)
-  * **Chemoinformatics:** `rdkit`
-  * **Data Analysis:** `pandas`, `scikit-learn` (StandardScaler, PCA)
-  * **Visualization:** `matplotlib`
+---
+*Maintained by Aleksander Stanuch as part of the Faculty of Biochemistry, Biophysics and Biotechnology curriculum at Jagiellonian University.*
