@@ -487,7 +487,7 @@ DimPlot(seurat_obj, reduction = "umap", label = TRUE)
 ## Zadanie 2
 # A) Zwizaulizuj jakie efekt ma ilość wybranych komponent PCA na póżniejszą analizę, wybierz znacznie mniej i więcej niż optymalnie i pokaż efekt, w którym przypadku więcej ryzykujemy utraty potencjalnych informacji? 
 
-# B) Przeprować i porównaj klastrowanie z różną rozdzielczością (3/4 wartości w przedziale 0.3 - 1.8). Zwróć uwagę jak dobrze rozdzielają się poszczególny klastry, czy indywidulne klastry zajmują różną pozycję na wykresie UMAP, która rozdzielczość według ciebie ma największy sens  
+# B) Przeprowadź i porównaj klastrowanie z różną rozdzielczością (3/4 wartości w przedziale 0.3 - 1.8). Zwróć uwagę jak dobrze rozdzielają się poszczególny klastry, czy indywidulne klastry zajmują różną pozycję na wykresie UMAP, która rozdzielczość według ciebie ma największy sens  
 
 
 ## Analiza i anotacja poszczególnych klastrów 
@@ -500,7 +500,7 @@ DimPlot(seurat_obj, group.by = "sample", label = TRUE)
 ```
 
 ## Zadanie 3 
-Zinterpretuj te wyniki - co ma największt wpływ na klastrowanie, pacjent, czy fakt czy komórka jest nowotworowa czy nie, czy może przypisywany typ komórki? 
+Zinterpretuj te wyniki - co ma największy wpływ na klastrowanie, pacjent, czy fakt czy komórka jest nowotworowa czy nie, czy może przypisywany typ komórki? 
 
 
 # Znajdowanie markerów poszczególnych klastrów
