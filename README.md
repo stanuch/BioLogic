@@ -4,10 +4,10 @@
 
 This repository contains implementations of algorithms, data pipelines, and analysis tools developed during the **Bioinformatics 2** curriculum at the Faculty of Biochemistry, Biophysics and Biotechnology, Jagiellonian University. The focus is on the mathematical implementation of biological algorithms and efficient data processing
 
-<img src="https://img.shields.io/badge/Jupyter-Notebooks-orange?logo=jupyter&logoColor=white" alt="Jupyter">
-<img src="https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white" alt="Python">
-<img src="https://img.shields.io/badge/R-scRNA--seq-276DC3?logo=r&logoColor=white" alt="R">
-<img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+![Jupyter](https://img.shields.io/badge/Jupyter-Notebooks-orange?logo=jupyter&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)
+![R](https://img.shields.io/badge/R-Studio-276DC3?logo=r&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ This repository contains implementations of algorithms, data pipelines, and anal
 - [Genomics and Sequence Analysis](#genomics-and-sequence-analysis)
 - [Structural Bioinformatics](#structural-bioinformatics)
 - [Technical Stack](#technical-stack)
-- [Missing Data Files](#missing-data-files)
+- [Disclaimer and Missing Data Files](#disclaimer-and-missing-data-files)
 - [License](#license)
 
 ## Overview
