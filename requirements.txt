@@ -1,0 +1,11 @@
+numpy
+scipy
+polars
+matplotlib
+seaborn
+biopython
+pyhmmer
+rdkit
+jupyter
+pymol-open-source
+scikit-learn

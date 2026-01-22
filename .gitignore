@@ -4,6 +4,26 @@
 *.html
 *.docx
 
+# ================================================
+# Large data files - see README in each module for download instructions
+# ================================================
+
+# Electron density maps (crystallography)
+*.map
+
+# Large FASTA files
+03_Genome_Analysis/data/e_coli.fasta
+09_scRNA_Seq/data/Cells.csv
+09_scRNA_Seq/data/Genes.txt
+
+# Bulk protein sequences (PyHMMER)
+05_Protein_Domains/prots/
+
+# Lecture materials (excluded for copyright)
+cwiczenia5/
+*.pdf
+INSTRUCTIONS.md
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
