@@ -85,6 +85,7 @@ Some large data files are excluded from this repository. Each module's README co
 |------|--------|--------|
 | `e_coli.fasta` | 03_Genome_Analysis | [NCBI](https://www.ncbi.nlm.nih.gov/) |
 | Protein FASTAs | 05_Protein_Domains | UniProt batch download |
+| `*.cif` files | 06_Protein_Structure_Prediction | [AlphaFold](https://alphafoldserver.com/) and [I-TASSER](https://aideepmed.com/I-TASSER/) |
 | scRNA data | 09_scRNA_Seq | Course materials |
 | `*.map` files | 10_Crystallography | PDB electron density server |
 
