@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Dec  8 20:25:50 2025
-
-"""
-
-
 def nussinov_table(seq, gamma, ell=0):
     table = [[0 for _ in range(len(seq))] for _ in range(len(seq))]
     for diff in range(1+ell, len(seq)):
@@ -13,7 +6,7 @@ def nussinov_table(seq, gamma, ell=0):
             opt = -1
             # case 1: if matches
             if (seq[i], seq[j]) in gamma:
-                curr_opt = table[i+1][j-1] + 1
+                curr_opt = table[i+1][j-1] + gamma[(seq[i], seq[j])]
                 if curr_opt > opt:
                     opt = curr_opt
             # case 2: skip head
@@ -40,14 +33,14 @@ def reconstruction(seq, table, gamma, ell=0):
     record = []
     while len(stack) > 0:
         i,j = stack.pop()
-        print(i, j)
+        # print(i, j)
         if i + ell >= j:
             continue
         elif table[i+1][j] == table[i][j]:
             stack.append((i+1, j))
         elif table[i][j-1] == table[i][j]:
             stack.append((i, j-1))
-        elif table[i+1][j-1] +1 == table[i][j]:
+        elif (seq[i], seq[j]) in gamma and table[i+1][j-1] + gamma[(seq[i], seq[j])] == table[i][j]:
             record.append((i, j))
             stack.append((i+1, j-1))
         else:
@@ -59,12 +52,6 @@ def reconstruction(seq, table, gamma, ell=0):
 
     return record
 
-    #  representation = ['.' for w in seq]
-    #  for (i, j) in record:
-    #      representation[i] = '('
-    #      representation[j] = ')'
-    #  return ''.join(representation)
-
 def reconstruction_helper(seq, i, j, table, gamma, ell=0):
     solutions = []
     if i + ell >= j:
@@ -73,7 +60,7 @@ def reconstruction_helper(seq, i, j, table, gamma, ell=0):
         solutions += reconstruction_helper(seq, i+1, j, table, gamma, ell)
     if table[i][j-1] == table[i][j]:
         solutions += reconstruction_helper(seq, i, j-1, table, gamma, ell)
-    if table[i+1][j-1] + 1 == table[i][j] and (seq[i], seq[j]) in gamma:
+    if (seq[i], seq[j]) in gamma and table[i+1][j-1] + gamma[(seq[i], seq[j])] == table[i][j]:
         prev_sols = reconstruction_helper(seq, i+1, j-1, table, gamma, ell)
         if len(prev_sols) == 0:
             prev_sols = [[(i, j)]]
@@ -93,25 +80,6 @@ def reconstruction_helper(seq, i, j, table, gamma, ell=0):
             solutions += combined_sols
     return solutions
 
-def reconstruction_all(seq, table, gamma, ell=0):
-    all_sols = reconstruction_helper(seq, 0, len(seq)-1, table, gamma, ell=ell)
-    for i in range(len(all_sols)):
-        record = all_sols[i]
-        all_sols[i] = sorted(record)
-    all_sols = sorted(all_sols)
-    dedup = [all_sols[i] for i in range(len(all_sols)) if i == 0 or all_sols[i] != all_sols[i-1]]
-    return dedup
-    #  reps = []
-    #  for record in all_sols:
-    #      representation = ['.' for w in seq]
-    #      for (i, j) in record:
-    #          representation[i] = '('
-    #          representation[j] = ')'
-    #      representation = ''.join(representation)
-    #      reps.append(representation)
-    #  reps = list(set(reps))
-    #  return reps
-
 def to_dot_bracket(seq, record):
     representation = ['.' for w in seq]
     for (i, j) in record:
@@ -120,26 +88,14 @@ def to_dot_bracket(seq, record):
     representation = ''.join(representation)
     return representation
 
+GAMMA_SCORING = {('G', 'C'): 3, ('C', 'G'): 3, ('A', 'U'): 2, ('U', 'A'): 2, ('G', 'U'): 1, ('U', 'G'): 1}
 
+string = 'AUUAACCGCGGUUAAUCGCG'
+ell = 3
 
+max_score, table = nussinov_table(string, GAMMA_SCORING, ell)
+record = reconstruction(string, table, GAMMA_SCORING, ell)
+dot_bracket = to_dot_bracket(string, record)
 
-GAMMA = set([('A', 'U'), ('U', 'A'), ('C', 'G'), ('G', 'C')])
-string = 'GCAGCAUUCG'
-#  string = 'AUAU'
-#  string = 'GGUCCAC'
-ell = 1
-ans, table = nussinov_table(string, GAMMA, ell)
-print(ans)
-print(table)
-
-## single solution
-record = reconstruction(string, table, ell)
-#print(to_dot_bracket(string, record))
-
-## enumerate solutions
-#all_solns = reconstruction_all(string, table, GAMMA, ell=ell)
-#print('Found {} solutions'.format(len(all_solns)))
-#for record in all_solns:
-#    print(to_dot_bracket(string, record))
-#    visualize_reconstruction(string, table, record, ell=ell)
-
+print(f"Sekwencja: {string}")
+print(f"Struktura: {dot_bracket}")

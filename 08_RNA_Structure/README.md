@@ -12,10 +12,10 @@ Implementation of the Nussinov algorithm for RNA secondary structure prediction.
 
 | File | Description |
 |------|-------------|
-| `nussinov.py` | Core algorithm implementation |
-| `nussinov_enhanced.py` | Extended version with loop constraints |
-| `visualization.py` | Structure visualization utilities |
-| `rna_analysis.ipynb` | RNA analysis notebook |
+| `img/` | Images of 2D structures used in `.ipynb` file|
+| `nussinov.py` | Core algorithm implementation with loop constraints |
+| `visualization.py` | Structures data visualization |
+| `rna_structure_prediction.ipynb` | RNA structure prediction notebook |
 
 ## Algorithm Overview
 
