@@ -4,8 +4,9 @@
 *.html
 *.docx
 
-# Electron density maps (crystallography)
+# Crystallography data files
 *.map
+*.cif
 
 # Large FASTA files
 03_Genome_Analysis/data/e_coli.fasta

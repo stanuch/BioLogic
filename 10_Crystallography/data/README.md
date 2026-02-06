@@ -14,15 +14,22 @@ Electron density map analysis and radiation damage assessment.
 |------|-------------|
 | `electron_density_analysis.ipynb` | Main analysis notebook |
 | `damage_scenes.py` | PyMOL scene generation |
+| `notes.txt` | Personal notes and observations |
+| `data/` | Input data files |
 | `img/` | Output visualizations |
 
-## Missing Data Files
+## Excluded Data Files
 
-| File | Size | Description |
-|------|------|-------------|
-| `*.map` | ~5 MB each | CCP4 format electron density maps |
+Large data files are excluded from the repository via `.gitignore`:
 
-Maps can be downloaded from the [PDB Electron Density Server](https://www.ebi.ac.uk/pdbe/eds/).
+| File | Description |
+|------|-------------|
+| `*.map` | CCP4 format electron density maps |
+| `*.cif` | mmCIF structure files |
+
+These can be downloaded from:
+- [PDB Electron Density Server](https://www.ebi.ac.uk/pdbe/eds/) (maps)
+- [RCSB PDB](https://www.rcsb.org/) (CIF files, e.g. 3T96, 4MS4)
 
 ## Key Concepts
 
