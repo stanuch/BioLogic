@@ -3,7 +3,6 @@ title: "scRNAseq intro class"
 author: "Krzysztof Szade"
 date: "2026-01-10"
 output:
-  pdf_document: default
   html_document: default
 ---
 
@@ -54,6 +53,9 @@ library("Matrix")
 
 ```
 
+packages <- c("Seurat", "dplyr", "ggplot2", "patchwork", "cowplot", 
+              "ggrepel", "RColorBrewer", "enrichR", "Matrix", "SeuratObject")
+lapply(packages, library, character.only = TRUE)
 
 ## Wczytywanie danych 
 
@@ -299,6 +301,8 @@ Co oznacza scale.factor?
 W jaki sposób normalizuje się rozkład danych? 
 Co oznacza i dlaczego stosujemy funkcję log1p(x):
 
+- Normalizacja polega na podzieleniu liczby zliczeń dla genu przez całkowitą liczbę zliczeń w komórce i wymnożenie przez scale.factor. Funkcja log1p(x) to algorytm naturalny z x+1, aby zmniejszyć wpływ genów o bardzo wyokiej ekspresji
+
 Normalizujemy. Uwaga dane znormalizowane są w nowej warstwie "layer", innej niż wyjściowe zliczenia, które są w warstwie "counts"
 
 ```{r}
@@ -489,18 +493,50 @@ DimPlot(seurat_obj, reduction = "umap", label = TRUE)
 
 # B) Przeprowadź i porównaj klastrowanie z różną rozdzielczością (3/4 wartości w przedziale 0.3 - 1.8). Zwróć uwagę jak dobrze rozdzielają się poszczególny klastry, czy indywidulne klastry zajmują różną pozycję na wykresie UMAP, która rozdzielczość według ciebie ma największy sens  
 
+```{r}
+seurat_low <- RunUMAP(seurat_obj, dims = 1:3)
+p1 <- DimPlot(seurat_low, reduction = "umap") + ggtitle("Za mało PCA (3)")
+
+seurat_opt <- RunUMAP(seurat_obj, dims = 1:20)
+p2 <- DimPlot(seurat_opt, reduction = "umap") + ggtitle("Optymalne PCA (20)")
+
+seurat_high <- RunUMAP(seurat_obj, dims = 1:50)
+p3 <- DimPlot(seurat_high, reduction = "umap") + ggtitle("Za dużo PCA (50)")
+
+p1 + p2 + p3
+
+seurat_obj <- FindNeighbors(seurat_obj, dims = 1:20)
+
+seurat_obj <- FindClusters(seurat_obj, resolution = 0.3)
+c1 <- DimPlot(seurat_obj, reduction = "umap", label = TRUE) + ggtitle("Res 0.3")
+
+seurat_obj <- FindClusters(seurat_obj, resolution = 0.8)
+c2 <- DimPlot(seurat_obj, reduction = "umap", label = TRUE) + ggtitle("Res 0.8")
+
+seurat_obj <- FindClusters(seurat_obj, resolution = 1.5)
+c3 <- DimPlot(seurat_obj, reduction = "umap", label = TRUE) + ggtitle("Res 1.5")
+
+c1 + c2 + c3
+```
+Przy zbyt małej wartości PCA ryzykujemy utratę informacji biologicznej. Różne typy komórek są wtedy wrzucane do jednej grupy. Przy zbyt dużej ilości ryzyko idzie w drugą stronę i możemy oddzielić od siebie klastry które powinny być połączone. 
+
+Niska rozdzielczość tworzy mało klastrów i łaczy rózne typy komórek w jedno. Przy zbyt wysokiej jest bardzo dużo małych wysp. 0.8 wydaje się mieć największy sens, bo komórko dzielą się na populacje, ale nie są za bardzo porozdzielane.
 
 ## Analiza i anotacja poszczególnych klastrów 
 
 W naszym przyadku mamy uproszczone zadanie - dysponujemy informacjami, które pochodzą z wcześniej przeprowadzonych analiz - mamy je  zapisane w naszych metadata. Zobaczmy jak to wygląda, dla poszczególnych pacjentów, czy wcześniej przypisanych typów komórek, w zależnoścu czy komórka jest nowotworowa czy nie.
 
 ```{r}
-DimPlot(seurat_obj, group.by = "cell_type")
-DimPlot(seurat_obj, group.by = "sample", label = TRUE)
+p1 <- DimPlot(seurat_obj, group.by = "cell_type")
+p2 <- DimPlot(seurat_obj, group.by = "sample", label = TRUE)
+
+p1+p2
 ```
 
 ## Zadanie 3 
 Zinterpretuj te wyniki - co ma największy wpływ na klastrowanie, pacjent, czy fakt czy komórka jest nowotworowa czy nie, czy może przypisywany typ komórki? 
+
+W przypadku komórek takich jak limfocyty albo makrofragi decydujący jest typ komórki. Grupują się razem niezależnie od pochodzenia (jaki pacjent. Natomiast w przypadku komórek nowotworowych dominującym czynnikiem jest pacjent, co objawia się osobnymi klastrami dla każdego chorego. Wskazuje to na heterogenność między guzami, w przeciwieństwie do komórek prawidłowych
 
 
 # Znajdowanie markerów poszczególnych klastrów
@@ -578,46 +614,24 @@ barplot(
 
 #B Spróbuj zindetyfikować komórki w oparciu o kilka różnych baz danych, np. , "PanglaoDB_Augmented_2021" "ARCHS4_Tissues" "CellMarker_2024" Spr. czy klaster który analizujesz jest anotowany jako nowotowrowy czy nie - możesz spróbować zindetyfikować typ nowotworu korzystając z baz takich jak: Cancer_Cell_Line_Encyclopedia MSigDB_Hallmark_2020. Przedstaw wyniki na wykresie i krótko zinterpretuj
 
+```{r}
+cluster1.markers <- FindMarkers(seurat_obj, ident.1 = 1, min.pct = 0.25, logfc.threshold = 0.25)
 
+top_genes <- rownames(cluster1.markers)[1:4]
 
-## Dla chętnych :) 
+FeaturePlot(seurat_obj, features = top_genes)
 
-Poniżej jak zrobic analizę cyklu komórkowego dla poszzcególnej komórki w oparciu o ekspresję genów. 
-
-Warto też zobaczyć publikajcę z której wyniki analizujecie i porównać waszą analizę z tą opublikowaną w artykule.  
-
-
-
-```{r error = TRUE}
-cc.genes <- Seurat::cc.genes
-s.genes  <- cc.genes$s.genes
-g2m.genes <- cc.genes$g2m.genes
-
-DefaultAssay(seurat_obj)
-
-seurat_obj <- CellCycleScoring(seurat_obj,
-  object = seurat_obj,
-  g2m.features = cc.genes$g2m.genes,
-  s.features = cc.genes$s.genes)
-head(seurat_obj@meta.data)
-
+VlnPlot(seurat_obj, features = top_genes, pt.size = 0)
 ```
+Wizualizacja ekspresji wybranych markerów pokazuje, że są specyficzne, czyli, że świecą jasno tylko w obrębie jednej grupy, a są wygaszone w pozostałych. Potwierdza to również wykres Violin Plot. Oznacza to, że markery są unikatowe i wystarczające do jednoznacznej definicji tej populacji, a klaster dobrze odróżnia się od pozostałych
 
-?CellCycleScoring
+```{r}
+library(enrichR)
+dbs_list <- c("PanglaoDB_Augmented_2021")
+markers_for_enrich <- rownames(cluster1.markers)[1:50]
 
-```{r error = TRUE}
-s.genes.use  <- intersect(s.genes, rownames(seurat_obj))
-g2m.genes.use <- intersect(g2m.genes, rownames(seurat_obj))
+enriched <- enrichr(markers_for_enrich, dbs_list)
 
-seurat_obj <- CellCycleScoring(
-  seurat_obj,
-  s.features = s.genes.use,
-  g2m.features = g2m.genes.use,
-  assay = "RNA",
-  slot = "data",
-  set.ident = FALSE
-)
+plotEnrich(enriched[["PanglaoDB_Augmented_2021"]], showTerms = 10, numChar = 40, y = "Count", orderBy = "P.value", title = "Typ komórki")
 ```
-
-
-
+Wyniki z bazy pokazują badaną populację jako T cells. Oznacza to, że analizowany klaster nie składa się raczej z komórek nowotworowych, lecz z komórek układu odpornościowego, które są obecne w mikrośrodowisku guza.

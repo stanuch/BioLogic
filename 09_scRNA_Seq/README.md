@@ -12,7 +12,7 @@ Introduction to single-cell transcriptomics analysis in R.
 
 | File | Description |
 |------|-------------|
-| `scrna_introduction.Rmd` | R Markdown analysis document |
+| `scRNA_Introduction.Rmd` | R Markdown analysis document |
 | `data/Samples.csv` | Sample metadata |
 
 ## Missing Data Files
@@ -23,7 +23,7 @@ Introduction to single-cell transcriptomics analysis in R.
 | `data/Genes.txt` | ~175 KB | Gene annotations |
 | `data/Exp_data_UMIcounts.mtx` | ~780.7 MB | Expression data |
 
-These files were provided as course materials.
+These files were provided as course materials and are openly available on GEO DataSets.
 
 ## Prerequisites
 
