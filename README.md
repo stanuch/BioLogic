@@ -77,7 +77,7 @@ To validate structural models, I implemented the **Kabsch algorithm** using **Si
 >
 > This repository has been reorganized from its original academic structure into a thematic portfolio. As a result, some relative file paths inside the notebooks (`.ipynb`) and scripts (`.py`) may reference directories that have been moved or renamed.
 >
-> While this might prevent some scripts from executing "out of the box" without path adjustments, the logic, implementation details, and code structure remain fully intact.
+> While this might prevent some scripts from executing "out of the box" without path adjustments, the logic, implementation details, and code structure remain fully intact. Also, notebooks were translated from Polish to English, so some phrasing might sound a bit unnatural or incorrect. Some leftovers of my beautiful Polish langauge may still be found in the code.
 
 Some large data files are excluded from this repository. Each module's README contains instructions for obtaining necessary files. Key exclusions:
 
@@ -91,8 +91,8 @@ Some large data files are excluded from this repository. Each module's README co
 
 ## License
 
-This repository is licensed under the **MIT License**. You are free to use, modify, and distribute the code.
+- **My solutions, code, and documentation** are licensed under the [MIT License](LICENSE).
+- **Course materials and exercise descriptions** (embedded in notebooks) remain the intellectual property of their respective authors at Jagiellonian University and are included here for educational and portfolio purposes with attribution.
 
-> **Note**: Some instructional materials are based on course content provided by faculty instructors and may be subject to their original copyright. All original code, analysis, and documentation created by me are freely available under the MIT License.
 ---
-*Maintained by Aleksander Stanuch as part of the Faculty of Biochemistry, Biophysics and Biotechnology curriculum at Jagiellonian University.*
+*Maintained by Aleksander Stanuch — Faculty of Biochemistry, Biophysics and Biotechnology, Jagiellonian University.*

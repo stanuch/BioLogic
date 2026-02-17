@@ -13,6 +13,7 @@ Hidden Markov Model-based domain identification using PyHMMER and Pfam.
 | File | Description |
 |------|-------------|
 | `hmm_domain_analysis.ipynb` | Main analysis notebook |
+| `data_analysis_and_processing.ipynb` | A small introduction to data analysis and processing |
 | `output/` | Domain search results |
 
 ## Missing Data Files

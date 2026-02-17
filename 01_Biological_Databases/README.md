@@ -15,6 +15,7 @@ Automated pipelines for accessing and processing data from biological and chemic
 | `database_access.ipynb` | Main notebook demonstrating API access patterns |
 | `utils.py` | Helper functions for data retrieval |
 | `sequences.fasta` | Sample protein sequences |
+| `titles.txt` | List of titles from 'Task 2' in the `.ipynb` file |
 
 ## Key Techniques
 
